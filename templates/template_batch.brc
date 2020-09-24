@@ -1,0 +1,39 @@
+#!/bin/csh
+
+###################123456789012345
+#SBATCH --job-name=YearYearMonthMonthDayDay_invD
+#SBATCH --dependency=singleton
+#SBATCH --ntasks=20
+#SBATCH --time=072:00:00
+#SBATCH --output=log/slurm_%j.out
+######### savio3 (condo)
+#SBATCH --partition=savio3
+#SBATCH --qos=aiolos_savio3_normal
+#SBATCH --account=co_aiolos
+######### savio2_bigmem (condo)
+###SBATCH --partition=savio2_bigmem
+###SBATCH --qos=aiolos_bigmem2_normal
+###SBATCH --account=co_aiolos
+######### savio_bigmem (lowprio)
+###SBATCH --partition=savio_bigmem
+###SBATCH --qos=savio_lowprio
+###SBATCH --account=co_aiolos
+######### savio_bigmem (paid)
+###SBATCH --partition=savio_bigmem
+###SBATCH --qos=savio_normal
+###SBATCH --account=fc_nitrates
+
+### Diagnostics
+echo "Start Inversion"
+echo "Run on $SLURM_JOB_NUM_NODES nodes with $SLURM_JOB_CPUS_PER_NODE cpus per node"
+echo "------------------------------------------"
+echo "* BEGINNING JOB"
+echo "YearYearMonthMonthDayDay_inv start: "`date`
+echo " " 
+
+### Specify the base directory and number of processors
+set runDir = "/global/home/users/aturner/BEACON_Inv"
+set nProcs = 20
+
+### Load julia and run the script
+cd $runDir
