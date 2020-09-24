@@ -105,13 +105,6 @@ global obsFreq    # Observations per hour
          bkgErr[i] = maximum([bkgErr[i],bkgErr_AMFX[i]])
       end
    end
-   # Throw out nighttime data
-   #for i in 1:length(bkgCO2)
-   #   if 4 < Dates.value(Dates.Hour(obsTime[i])) && Dates.value(Dates.Hour(obsTime[i])) < 13 # Throw out data between 10pm and 5am
-   #      obsLon[i] = -9999
-   #      obsLat[i] = -9999
-   #   end
-   #end
 
    ### Reduce the matrix sizes
    # Index for the observations
@@ -342,18 +335,18 @@ global obsFreq    # Observations per hour
       Sa_xy = sparse(I_xy,J_xy,C_xy,nG,  nG)
       Base.GC.gc() # Garbage collect
       ## Save the covariances
-      #df_t  = DataFrame([:I => I_t,  :J => J_t,  :V => C_t])
-      #df_xy = DataFrame([:I => I_xy, :J => J_xy, :V => C_xy])
-      #CSV.write(@sprintf("./stored_data/cov_T_%i_%id_%ih.csv",nEms,tau_day,tau_hr), df_t, writeheader=false)
-      #CSV.write(@sprintf("./stored_data/cov_XY_%i_%ikm.csv",nG,tau_len), df_xy, writeheader=false)
+      df_t  = DataFrame([:I => I_t,  :J => J_t,  :V => C_t])
+      df_xy = DataFrame([:I => I_xy, :J => J_xy, :V => C_xy])
+      CSV.write(@sprintf("./stored_data/cov_T_%i_%id_%ih.csv",nEms,tau_day,tau_hr), df_t, writeheader=false)
+      CSV.write(@sprintf("./stored_data/cov_XY_%i_%ikm.csv",nG,tau_len), df_xy, writeheader=false)
    end
 
    ### Invert
    if diag_prior # Diagonal
       (x_hat,dofs) = invert_ems(K_mat[iTrain,:],mismatch[iTrain],Sa_d,So_d,x_pri)
    else # Full covariance
-      #(x_hat,dofs) = invert_ems(K_mat[iTrain,:],mismatch[iTrain],Sa_t,Sa_xy,So,x_pri)
-      (x_hat,dofs) = debug_invert_ems(K_mat[iTrain,:],mismatch[iTrain],Sa_t,Sa_xy,So,x_pri)
+      (x_hat,dofs) = invert_ems(K_mat[iTrain,:],mismatch[iTrain],Sa_t,Sa_xy,So,x_pri)
+      #(x_hat,dofs) = debug_invert_ems(K_mat[iTrain,:],mismatch[iTrain],Sa_t,Sa_xy,So,x_pri)
    end
    Base.GC.gc() # Garbage collect
 
@@ -475,14 +468,12 @@ function build_xy(tau_len,x_pri,ind_arr,lon_grid,lat_grid)
    ind_time = convert(Array{IntType,1},ind_arr[:,1])
    # First pass to get data
    for i = 1:nG
-      #@printf("Pass 1 #%i/%i (%5.2f):     \n",i,nG,(i/nG*100))
       emsALL[:,i]   = vec(x_pri[ind_time .- 1 .+ i])
       ocean[i]      = allzero(emsALL[:,i])
       dist_mat[i,:] = sqrt.( (lon_grid[i] .- lon_grid).^2 .+ (lat_grid[i] .- lat_grid).^2 )
    end
    # Second pass to fill
    for i = 1:nG
-      #@printf("Pass 2 #%i/%i (%5.2f):     \n",i,nG,(i/nG*100))
       for j = 1:i
          if dist_mat[i,j] < min_dist
             # don't allow ocean-land interactions
@@ -507,7 +498,6 @@ function build_xy(tau_len,x_pri,ind_arr,lon_grid,lat_grid)
    end 
    # Third pass to ensure there are no ocean-land interactions
    for i = 1:nG
-      #@printf("Pass 3 #%i/%i (%5.2f):     \n",i,nG,(i/nG*100))
       for j = 1:i
          if dist_mat[i,j] < min_dist
             # don't allow ocean-land interactions
@@ -536,7 +526,7 @@ function invert_ems(K_mat::SparseMatrixCSC,mismatch::AbstractArray,Sa_t::SparseM
    KSa      = hq(K_mat,Sa_t,Sa_xy);            Base.GC.gc()
    G        = hqht_fast(KSa,K_mat,Sa_t,Sa_xy); Base.GC.gc()
    G        = G + So;                          Base.GC.gc()
-   mismatch = G \ mismatch;                    Base.GC.gc()
+   mismatch = G \ Array(mismatch[:]);          Base.GC.gc()
    x_dif    = KSa' * sparse(mismatch);         Base.GC.gc()
    x_hat    = x_pri + x_dif;                   Base.GC.gc()
    # Return data
@@ -554,7 +544,7 @@ function debug_invert_ems(K_mat::SparseMatrixCSC,mismatch::AbstractArray,Sa_t::S
 @printf("G:      ")
    @time G        = G + So;                          Base.GC.gc()
 @printf("inv(G): ")
-   @time mismatch = G \ Array(mismatch[:]);             Base.GC.gc()
+   @time mismatch = G \ Array(mismatch[:]);          Base.GC.gc()
 @printf("KSaTG:  ")
    @time x_dif    = KSa' * sparse(mismatch);         Base.GC.gc()
 @printf("x_hat:  ")

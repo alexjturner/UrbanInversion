@@ -91,6 +91,7 @@ endTime    = startTime + invWindow
 Inv_timLim = [ startTime - Dates.Hour(nHr), endTime + Dates.Hour(nHr) ]
 
 ### Make output folders?
+ispath("./stored_data")   ? nothing : mkdir("./stored_data")
 ispath("./output")        ? nothing : mkdir("./output")
 ispath("./output/ems")    ? nothing : mkdir("./output/ems")
 ispath("./output/obs")    ? nothing : mkdir("./output/obs")
