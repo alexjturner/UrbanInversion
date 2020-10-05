@@ -109,7 +109,6 @@ println("* READING OBSERVATION AND FOOTPRINT DATA")
 ### Read the emission information
 println("* READING EMISSIONS DATA")
 (latE,lonE,ems,emsTime) = get_emission_data(Inv_latLim,Inv_lonLim,Inv_timLim)
-#(latE,lonE,ems,emsTime) = get_emission_data_2x(Inv_latLim,Inv_lonLim,Inv_timLim)
 
 ### Diagnostic
 println("* ALL DATA READ")
@@ -151,7 +150,6 @@ if save_ems
    println("* STORING EMISSIONS")
    outDir = cross_valid ? @sprintf("./output/ems_%04i",k_ind) : "./output/ems"
    save_emissions(outDir,x_hat,lon_red,lat_red,ems_Times)
-   #save_emissions_2x(outDir,x_hat,lon_red,lat_red,ems_Times)
 
    ### Estimated emissions
    println("* STORING OBSERVATIONS")
