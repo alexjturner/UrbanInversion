@@ -12,6 +12,7 @@ September 24, 2020
  * Users will need to link the obs files into the obs directory and the emissions files into the ems directory: see `linkDat.csh`.
  * Users should then edit the time window and run parameters in `make_scripts.csh` before building the driver scripts.
  * Additional inversion parameters can be modified in `templates/template_est_fluxes.jl`.
+ * The parameters controlling the correlations in the error covariance matrices are in `estimate_ems` in `Util/solve_inv_funcs.jl`.
  * The actual inversion code is located in `Util/solve_inv_funcs.jl`.
  * Input data (obs and emission files) and output will be uploaded to the ORNL DAAC upon paper acceptance.
 
