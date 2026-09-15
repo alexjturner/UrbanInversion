@@ -7,8 +7,8 @@ September 24, 2020
 
 
 # Info
- * The published paper can be found here: "XX".
- * BEACO2N observations can be found on the project website here: "http://beacon.berkeley.edu".
+ * The published paper can be found here: "[https://doi.org/10.1029/2020GL090037](https://doi.org/10.1029/2020GL090037)".
+ * BEACO2N observations can be found on the project website here: "[http://beacon.berkeley.edu](http://beacon.berkeley.edu)".
  * Users will need to link the obs files into the obs directory and the emissions files into the ems directory: see `linkDat.csh`.
  * Users should then edit the time window and run parameters in `make_scripts.csh` before building the driver scripts.
  * Additional inversion parameters can be modified in `templates/template_est_fluxes.jl`.
